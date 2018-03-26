@@ -88,7 +88,7 @@ class ZooKeeperServer(object):
         for line in response.splitlines():
             key, value = map(str.strip, line.split(': '))
             if key == 'Zxid':
-                value = int(value, 0)
+                value = long(value, 0)
                 log('key: %s, value: %s' % (key, value))
 
     def _get_mntr_stats(self):
