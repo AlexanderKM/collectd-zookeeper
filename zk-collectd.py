@@ -50,7 +50,7 @@ class ZooKeeperServer(object):
         # methods for each four-letter cmd
         stats.update(self._get_health_stat())
         stats.update(self._get_mntr_stats())
-        self._get_srvr_stats()
+        stats.update(self._get_srvr_stats())
         return stats
 
     def _create_socket(self):
@@ -88,8 +88,11 @@ class ZooKeeperServer(object):
         for line in response.splitlines():
             key, value = map(str.strip, line.split(': '))
             if key == 'Zxid':
+                # e.g. 0x1d04f2be75
                 value = long(value, 0)
-                log('key: %s, value: %s' % (key, value))
+                result[key] = value
+
+        return result
 
     def _get_mntr_stats(self):
         """Send 'mntr' 4letter word command and parse the output."""
