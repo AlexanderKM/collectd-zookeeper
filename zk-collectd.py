@@ -35,6 +35,7 @@ COUNTERS = set(["zk_packets_received", "zk_packets_sent"])
 RUOK_CMD = "ruok"
 IMOK_RESP = "imok"
 MNTR_CMD = "mntr"
+SRVR_CMD = "srvr"
 
 
 class ZooKeeperServer(object):
@@ -49,6 +50,7 @@ class ZooKeeperServer(object):
         # methods for each four-letter cmd
         stats.update(self._get_health_stat())
         stats.update(self._get_mntr_stats())
+        self._get_srvr_stats()
         return stats
 
     def _create_socket(self):
@@ -78,6 +80,14 @@ class ZooKeeperServer(object):
         """Send the 'ruok' 4letter word command and parse the output."""
         response = self._send_cmd(RUOK_CMD)
         return {'zk_service_health': int(response == IMOK_RESP)}
+
+    def _get_srvr_stats(self):
+        response = self._send_cmd(SRVR_CMD)
+        result = {}
+
+        for line in response.splitlines():
+            key, value = map(str.strip, line.split(': '))
+            log('key: %s, value: %s' % (key, value))
 
     def _get_mntr_stats(self):
         """Send 'mntr' 4letter word command and parse the output."""
